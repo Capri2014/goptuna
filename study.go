@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	"go.uber.org/zap"
 )
@@ -33,6 +34,32 @@ type Study struct {
 	trialNotifyChan    chan FrozenTrial
 	mu                 sync.RWMutex
 	ctx                context.Context
+}
+
+func (s *Study) EnqueueTrial(
+	params map[string]interface{},
+	userAttrs map[string]interface{},
+	systemAttrs map[string]interface{}) error {
+	return nil
+}
+
+func (s *Study) popWaitingTrialID() (int, error) {
+	return -1, nil
+}
+
+// InjectTrial to inject a trial into the Study.
+func (s *Study) InjectTrial(
+	value float64,
+	params map[string]interface{},
+	distributions map[string]Distribution,
+	userAttrs map[string]interface{},
+	systemAttrs map[string]interface{},
+	intermediateValues map[int]float64,
+	state TrialState,
+	datetimeStart time.Time,
+	datetimeComplete time.Time,
+) error {
+	return nil
 }
 
 // GetTrials returns all trials in this study.

@@ -28,6 +28,7 @@ type Storage interface {
 	GetAllStudySummaries(studyID int) ([]StudySummary, error)
 	// Basic trial manipulation
 	CreateNewTrialID(studyID int) (int, error)
+	CloneTrial(studyID int, baseTrial FrozenTrial) (int, error)
 	SetTrialValue(trialID int, value float64) error
 	SetTrialIntermediateValue(trialID int, step int, value float64) error
 	SetTrialParam(trialID int, paramName string, paramValueInternal float64,
@@ -315,6 +316,11 @@ func (s *InMemoryStorage) CreateNewTrialID(studyID int) (int, error) {
 	return trialID, nil
 }
 
+// CloneTrial creates new Trial from the given base Trial.
+func (s *InMemoryStorage) CloneTrial(studyID int, baseTrial FrozenTrial) (int, error) {
+	return -1, nil
+}
+
 // SetTrialValue sets the value of trial.
 func (s *InMemoryStorage) SetTrialValue(trialID int, value float64) error {
 	s.mu.Lock()
@@ -396,6 +402,11 @@ func (s *InMemoryStorage) SetTrialState(trialID int, state TrialState) error {
 	trial := s.trials[trialID]
 	if trial.State.IsFinished() {
 		return ErrTrialCannotBeUpdated
+	}
+
+	oldState := trial.State
+	if state == TrialStateRunning && oldState != TrialStateWaiting {
+		return nil
 	}
 	trial.State = state
 	if trial.State.IsFinished() {
