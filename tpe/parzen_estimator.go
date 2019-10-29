@@ -36,30 +36,42 @@ func buildEstimator(
 
 	var sortedWeights []float64
 	var sortedMus []float64
+	var lowSortedMusHigh []float64
 	var sigma []float64
 
 	var order []int
+	var orderedMus []float64
 	var priorPos int
 	var priorSigma float64
 	if considerPrior {
 		priorMu := 0.5 * (low + high)
 		priorSigma = 1.0 * (high - low)
 		if len(mus) == 0 {
-			sortedMus = []float64{priorMu}
+			lowSortedMusHigh = []float64{0, priorMu, 0}
+			sortedMus = lowSortedMusHigh[1:2]
 			sigma = []float64{priorSigma}
 			priorPos = 0
 			order = make([]int, 0)
 		} else {
+			// we decide the place of prior.
 			order = make([]int, len(mus))
+			orderedMus = choice(mus, order)
 			floats.Argsort(mus, order)
-			priorPos = location(choice(mus, order), priorMu)
-			sortedMus = make([]float64, 0, len(mus)+1)
-			sortedMus = append(sortedMus, choice(mus, order[:priorPos])...)
-			sortedMus = append(sortedMus, priorMu)
-			sortedMus = append(sortedMus, choice(mus, order[priorPos:])...)
+			priorPos = location(orderedMus, priorMu)
+			// we decide the mus
+			lowSortedMusHigh = make([]float64, len(mus)+3)
+			sortedMus = lowSortedMusHigh[1 : len(lowSortedMusHigh)-1]
+			for i := 0; i < priorPos; i++ {
+				sortedMus[i] = orderedMus[i]
+			}
+			sortedMus[priorPos] = priorMu
+			for i := priorPos + 1; i < len(sortedMus); i++ {
+				sortedMus[i] = orderedMus[i]
+			}
 		}
 	} else {
 		order = make([]int, len(mus))
+		// we decide the mus
 		floats.Argsort(mus, order)
 		sortedMus = choice(mus, order)
 	}
