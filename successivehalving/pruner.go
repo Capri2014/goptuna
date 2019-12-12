@@ -42,6 +42,7 @@ type Pruner struct {
 	MinResource          int
 	ReductionFactor      int
 	MinEarlyStoppingRate int
+	RungKeyPrefix        string
 }
 
 func (p *Pruner) Prune(study *goptuna.Study, trial goptuna.FrozenTrial) (bool, error) {
@@ -72,7 +73,7 @@ func (p *Pruner) Prune(study *goptuna.Study, trial goptuna.FrozenTrial) (bool, e
 		}
 
 		err = study.Storage.SetTrialSystemAttr(
-			trial.ID, completedRungKey(rung),
+			trial.ID, p.completedRungKey(rung),
 			fmt.Sprintf("%f", value))
 		if err != nil {
 			return false, err
@@ -92,7 +93,7 @@ func (p *Pruner) Prune(study *goptuna.Study, trial goptuna.FrozenTrial) (bool, e
 func (p *Pruner) isPromotable(rung int, value float64, allTrials []goptuna.FrozenTrial, direction goptuna.StudyDirection) (bool, error) {
 	competingValues := make([]float64, 0, len(allTrials))
 	for i := range allTrials {
-		value, err := getValueAtRung(allTrials[i], rung)
+		value, err := getValueAtRung(allTrials[i], p.completedRungKey(rung))
 		if err == errRungNotFound {
 			continue
 		} else if err != nil {
@@ -124,10 +125,9 @@ func (p *Pruner) isPromotable(rung int, value float64, allTrials []goptuna.Froze
 	return value <= competingValues[promotableIdx], nil
 }
 
-func getValueAtRung(trial goptuna.FrozenTrial, rung int) (float64, error) {
-	rungkey := completedRungKey(rung)
+func getValueAtRung(trial goptuna.FrozenTrial, rungKey string) (float64, error) {
 	for key := range trial.SystemAttrs {
-		if key == rungkey {
+		if key == rungKey {
 			valuestr := trial.SystemAttrs[key]
 			return strconv.ParseFloat(valuestr, 64)
 		}
@@ -155,6 +155,6 @@ func getCurrentRung(trial goptuna.FrozenTrial) int {
 	return currentRung
 }
 
-func completedRungKey(rung int) string {
-	return fmt.Sprintf("completed_rung_%d", rung)
+func (p *Pruner) completedRungKey(rung int) string {
+	return fmt.Sprintf("%scompleted_rung_%d", p.RungKeyPrefix, rung)
 }
