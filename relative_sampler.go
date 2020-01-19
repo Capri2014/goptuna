@@ -33,7 +33,7 @@ func IntersectionSearchSpace(study *Study) (map[string]interface{}, error) {
 	}
 
 	for i := range trials {
-		if trials[i].State == TrialStateComplete {
+		if trials[i].State != TrialStateComplete {
 			continue
 		}
 
