@@ -9,7 +9,7 @@ import (
 
 // Sampler returns the next search points
 type Sampler interface {
-	// Sample a parameter for a given distribution.
+	// Sample a single parameter for a given distribution.
 	Sample(*Study, FrozenTrial, string, interface{}) (float64, error)
 }
 
