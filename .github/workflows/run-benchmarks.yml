@@ -2,6 +2,7 @@ name: Run kurobako benchmark
 on:
   pull_request:
     paths:
+    - 'cmaes/**.go'
     - 'internal/**.go'
     - 'tpe/**.go'
 jobs:
