@@ -2,19 +2,12 @@ package goptuna
 
 // RelativeSampler returns the next search points
 type RelativeSampler interface {
-	// InferRelativeSearchSpace infer the search space that will be used by relative sampling in the target trial.
-	//
-	// This method is called right before SampleRelative method, and the search space
-	// returned by this method is pass to it. The parameters not  contained in the
-	// search space will be sampled by using SampleIndependent method.
-	InferRelativeSearchSpace(*Study, Trial) (map[string]interface{}, error)
-
-	// SampleRelative samples multiple dimensional parameters in a given search space.
+	// Sample samples multiple dimensional parameters in a given search space.
 	//
 	// This method is called once at the beginning of each trial, i.e., right before the
 	// evaluation of the objective function. This method is suitable for sampling algorithms
 	// that use relationship between parameters such as Gaussian Process and CMA-ES.
-	SampleRelative(*Study, FrozenTrial, string, interface{}) (float64, error)
+	Sample(*Study, FrozenTrial, map[string]interface{}) (map[string]float64, error)
 }
 
 // IntersectionSearchSpace return return the intersection search space of the Study.

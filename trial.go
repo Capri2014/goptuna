@@ -33,10 +33,12 @@ func (i TrialState) IsFinished() bool {
 // Note that this object is seamlessly instantiated and passed to the objective function behind;
 // hence, in typical use cases, library users do not care about instantiation of this object.
 type Trial struct {
-	Study *Study
-	ID    int
-	state TrialState
-	value float64
+	Study               *Study
+	ID                  int
+	state               TrialState
+	value               float64
+	relativeParams      map[string]float64
+	relativeSearchSpace map[string]interface{}
 }
 
 func (t *Trial) suggest(name string, distribution interface{}) (float64, error) {

@@ -1,7 +1,6 @@
 package cmaes
 
 import (
-	"errors"
 	"math/rand"
 	"sync"
 
@@ -16,29 +15,11 @@ type Sampler struct {
 	mu  sync.Mutex
 }
 
-func (s *Sampler) InferRelativeSearchSpace(study *goptuna.Study, trial goptuna.Trial) (map[string]interface{}, error) {
-	intersection, err := goptuna.IntersectionSearchSpace(study)
-	if err != nil {
-		return nil, err
-	}
-	if intersection == nil {
-		return nil, nil
-	}
-	searchSpace := make(map[string]interface{}, len(intersection))
-	for paramName := range intersection {
-		distribution, ok := intersection[paramName].(goptuna.Distribution)
-		if !ok {
-			return nil, errors.New("failed to cast distribution")
-		}
-		if distribution.Single() {
-			continue
-		}
-		searchSpace[paramName] = distribution
-	}
-	return searchSpace, nil
-}
-
-func (s *Sampler) SampleRelative(*goptuna.Study, goptuna.FrozenTrial, string, interface{}) (float64, error) {
+func (s *Sampler) Sample(
+	study *goptuna.Study,
+	trial goptuna.FrozenTrial,
+	searchSpace map[string]interface{},
+) (map[string]float64, error) {
 	panic("implement me")
 }
 
