@@ -13,6 +13,7 @@ Currently following algorithms are implemented:
 
 * Random Search
 * Tree-structured Parzen Estimators (TPE)
+* Covariance Matrix Adaptation Evolution Strategy (CMA-ES)
 * Median Stopping Rule (Google Vizier)
 * Optuna flavored Asynchronous Successive Halving Algorithm (ASHA)
 
